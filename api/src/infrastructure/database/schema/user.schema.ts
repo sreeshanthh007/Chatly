@@ -18,6 +18,7 @@ export const UserSchema = new mongoose.Schema <IUserModel>({
     userName : {
         type : String,
         unique : true,
+        sparse:true,
         default:null
     },
 

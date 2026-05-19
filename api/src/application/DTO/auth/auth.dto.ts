@@ -18,3 +18,10 @@ export interface LoginRequestDTO {
  email:string;
  password:string;   
 }
+
+
+export interface RegisterRequestDTO {
+    fullName : string,
+    email : string,
+    password : string,
+}

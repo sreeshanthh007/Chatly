@@ -14,7 +14,9 @@ export class AuthRoute extends BaseRouter {
         
     }
     protected initializeRoutes(): void {
-        this.router.post(API_ENDPOINTS.AUTH.LOGIN,asyncHandler(authController.loginController.bind(authController)))
-        // this.router.post(API_ENDPOINTS.AUTH.REGISTER,asyncHandler(authController.registerController.bind(authController)))
+        this.router.post(API_ENDPOINTS.AUTH.LOGIN,asyncHandler(authController.loginController.bind(authController)));
+        this.router.post(API_ENDPOINTS.AUTH.REGISTER,asyncHandler(authController.registerController.bind(authController)));
+        this.router.post(API_ENDPOINTS.AUTH.SENT_OTP,asyncHandler(authController.sentOtpController.bind(authController)));
+        this.router.post(API_ENDPOINTS.AUTH.VERIFY_OTP,asyncHandler(authController.verifyOtpController.bind(authController)));
     }
 }

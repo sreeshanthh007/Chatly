@@ -1,10 +1,8 @@
 import { z } from "zod";
+import { emailSchema } from "./email.validator";
 
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .email("Invalid email format"),
+  ...emailSchema.shape,
   password: z
     .string()
     .min(6, "Password must be at least 6 characters"),

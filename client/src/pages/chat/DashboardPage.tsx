@@ -235,7 +235,7 @@ export default function DashboardPage() {
       )
     );
 
-    const sentText = inputText;
+
     setInputText("");
     setShowEmojiPicker(false);
 

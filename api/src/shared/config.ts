@@ -15,4 +15,6 @@ export const CONFIG = {
     REFRESH_EXPIRES_IN: process.env.REFRESH_EXPIRES_IN!,
     REDIS_HOST: process.env.REDIS_HOST!,
     REDIS_PORT: Number(process.env.REDIS_PORT),
+    EMAIL_USER:process.env.EMAIL_USER!,
+    EMAIL_PASS:process.env.EMAIL_PASS!
 }
