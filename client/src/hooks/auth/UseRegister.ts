@@ -9,6 +9,7 @@ export const UseRegister = () => {
     return useMutation<RegisterResponseDTO , Error , RegisterRequestDTO>({
         mutationFn: (data: RegisterRequestDTO) => registerService(data),
         onSuccess:(data:RegisterResponseDTO)=>{
+
             showSuccess(data.message)
         },  
         onError:(error:any)=>{

@@ -2,24 +2,60 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MessageCircle, AlertTriangle } from "lucide-react";
 import { AuthForm } from "../../components/auth/AuthForm";
+import { OtpModal } from "../../components/common/OtpModal";
 import { UseRegister } from "../../hooks/auth/UseRegister";
+import { useSentOtp } from "../../hooks/auth/UseSentOtp";
+import { useVerifyOtp } from "../../hooks/auth/UseVerifyOtp";
 import type { RegisterRequestDTO } from "../../DTO/auth.dto";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [generalError, setGeneralError] = useState("");
+  const [isOtpOpen, setIsOtpOpen] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [formData, setFormData] = useState<RegisterRequestDTO | null>(null);
 
   const registerMutation = UseRegister();
+  const sentOtpMutation = useSentOtp();
+  const verifyOtpMutation = useVerifyOtp();
+
 
   useEffect(() => {
-    if (registerMutation.isSuccess) {
+    if (sentOtpMutation.isSuccess) {
+      setIsOtpOpen(true);
+    }
+  }, [sentOtpMutation.isSuccess]);
+
+
+  useEffect(() => {
+    if (verifyOtpMutation.isSuccess && formData) {
+      registerMutation.mutate(formData);
+    }
+  }, [verifyOtpMutation.isSuccess, formData]);
+
+  useEffect(() => {
+    if (registerMutation.data?.success) {
+      setIsOtpOpen(false);
       navigate("/login");
     }
-  }, [registerMutation.isSuccess, navigate]);
+  }, [registerMutation.data?.success, navigate]);
 
   const handleRegisterSubmit = async (values: RegisterRequestDTO) => {
     setGeneralError("");
-    registerMutation.mutate(values);
+    setRegisteredEmail(values.email);
+    setFormData(values);
+    sentOtpMutation.mutate(values.email);
+  };
+
+  const handleOtpSubmit = async (otp: string) => {
+    verifyOtpMutation.mutate({
+      email: registeredEmail,
+      otp,
+    });
+  };
+
+  const handleOtpResend = () => {
+    sentOtpMutation.mutate(registeredEmail);
   };
 
   return (
@@ -53,7 +89,7 @@ export default function RegisterPage() {
         <AuthForm 
           type="register"
           onSubmit={handleRegisterSubmit} 
-          isLoading={registerMutation.isPending} 
+          isLoading={sentOtpMutation.isPending} 
         />
         <div className="mt-6 text-center text-xs text-text-secondary">
           Already have an account?{" "}
@@ -65,6 +101,15 @@ export default function RegisterPage() {
           </Link>
         </div>
       </div>
+
+      <OtpModal
+        isOpen={isOtpOpen}
+        onClose={() => setIsOtpOpen(false)}
+        onSubmit={handleOtpSubmit}
+        onResend={handleOtpResend}
+        isLoading={verifyOtpMutation.isPending || registerMutation.isPending}
+        email={registeredEmail}
+      />
     </div>
   );
 }

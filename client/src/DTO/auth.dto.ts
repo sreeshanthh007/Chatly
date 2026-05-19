@@ -22,6 +22,22 @@ export interface RegisterRequestDTO {
 
 
 export interface RegisterResponseDTO {
+    success:boolean
+    message:string
+}
+
+
+
+export interface SentOtpResponseDTO {
+    message:string
+}
+
+export interface VerifyOtpRequestDTO {
+    email : string,
+    otp : string,
+}
+
+export interface VerifyOtpResponseDTO {
     message:string
 }
 

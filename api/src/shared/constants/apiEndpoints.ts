@@ -7,6 +7,8 @@ export const API_ENDPOINTS = {
         REGISTER : "/register",
         LOGIN : "/login",
         LOGOUT : "/logout",
+        SENT_OTP : "/sent-otp",
+        VERIFY_OTP : "/verify-otp"
         
     }
 
