@@ -1,6 +1,8 @@
-import { ConnectDB } from "./infrastructure/database/db";
-import Server from "./infrastructure/http/server";
-import { CONFIG } from "./shared/config";
+import "reflect-metadata"
+import { ConnectDB } from "@infrastructure/database/db";
+import Server from "@presentation/http/server";
+import { CONFIG } from "@shared/config";
+import { logger } from "@shared/utils/logger";
 
 
 
@@ -18,7 +20,7 @@ class App{
 
         await new ConnectDB().connect()
          this.server.getApp().listen(CONFIG.PORT,()=>{
-            console.log(`Server is running on port ${CONFIG.PORT}`);
+            logger.info(`Server is running on port ${CONFIG.PORT}`);
          });
     }
 }
