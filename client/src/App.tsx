@@ -2,10 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import authRoutes from "./routes/authRoute";
 import chatRoutes from "./routes/chatRoute";
 import NotFoundPage from "./pages/NotFoundPage";
+import { Toaster } from "sonner";
 
 export function AppConfig() {
   return (
-    <BrowserRouter>
+    <>
+        <BrowserRouter>
       <Routes>
         {authRoutes}
         {chatRoutes}
@@ -13,6 +15,8 @@ export function AppConfig() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
+      <Toaster richColors position="top-center"/>
+    </>
   );
 }
 

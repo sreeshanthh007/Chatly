@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import { CONFIG } from "../../shared/config";
-
-
+import { CONFIG } from "@shared/config";
+import { logger } from "@shared/utils/logger";
 
 export class ConnectDB {
 
@@ -21,18 +20,18 @@ export class ConnectDB {
 				socketTimeoutMS: 45000,
 			});
             
-            console.log("Database connected");
+            logger.info("Database connected");
         } catch (error) {
-            console.error("Database connection error", error);
+            logger.error("Database connection error", error as Error);
         }
     }
 
     async disconnect() {
         try {
             await mongoose.disconnect();
-            console.log("Database disconnected");
+            logger.info("Database disconnected");
         } catch (error) {
-            console.error("Database disconnection error", error);
+            logger.error("Database disconnection error", error as Error);
         }
     }
 }
