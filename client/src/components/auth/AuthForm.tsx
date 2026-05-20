@@ -10,9 +10,10 @@ interface AuthFormProps {
   type: "login" | "register";
   onSubmit: (values: any) => void;
   isLoading: boolean;
+  onForgotPassword?: () => void;
 }
 
-export function AuthForm({ type, onSubmit, isLoading }: AuthFormProps) {
+export function AuthForm({ type, onSubmit, isLoading, onForgotPassword }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isLogin = type === "login";
 
@@ -89,12 +90,13 @@ export function AuthForm({ type, onSubmit, isLoading }: AuthFormProps) {
             Password
           </label>
           {isLogin && (
-            <a
-              href="#"
-              className="text-xs text-accent hover:text-accent-hover transition-colors font-medium"
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-xs text-accent hover:text-accent-hover transition-colors font-medium focus:outline-none"
             >
               Forgot password?
-            </a>
+            </button>
           )}
         </div>
         <div className="relative">

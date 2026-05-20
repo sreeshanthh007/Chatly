@@ -9,6 +9,7 @@ import { SUCCESS_MESSAGE } from "@shared/constants/messages";
 import { emailSchema } from "../validators/auth/email.validator";
 import { emailOtpSchema } from "../validators/auth/emailOtp.validator";
 import { logger } from "@shared/utils/logger";
+import { changePasswordSchema } from "../validators/auth/changePassword.validator";
 
 
 
@@ -101,6 +102,70 @@ export class AuthController {
         res.status(STATUS_CODE.OK_200).json({
             success:true,
             message:SUCCESS_MESSAGE.OTP_VERIFIED_SUCCESS
+        });
+        return;
+       }
+
+
+       async sendOtpForForgotPasswordController(req : Request , res : Response) : Promise<void> {
+
+            const {email} = req.body
+
+            const result = emailSchema.safeParse({email})
+
+            if(!result.success){
+                res.status(400).json({success : false , message : result.error?.issues[0].message});
+                return;
+            }
+
+            await this._authUseCase.sentOtpForForgotPassword(result.data.email);
+
+            res.status(STATUS_CODE.OK_200).json({
+                success:true,
+                message:SUCCESS_MESSAGE.OTP_SENT_SUCCESS
+            });
+            return;
+       }
+
+
+       async verifyOtpForForgotPasswordController(req : Request , res : Response) : Promise<void> {
+
+            const {email , otp} = req.body;
+
+            const result = emailOtpSchema.safeParse({email , otp});
+
+            if(!result.success){
+                res.status(400).json({success : false , message : result.error?.issues[0].message});
+                return;
+            }
+
+            await this._authUseCase.verifyOtpForForgotPassword(result.data.email,result.data.otp);
+
+            res.status(STATUS_CODE.OK_200).json({
+                success:true,
+                message:SUCCESS_MESSAGE.OTP_VERIFIED_SUCCESS
+            });
+            return;
+       }
+
+       async forgotPasswordController(req : Request , res : Response) : Promise<void> {
+
+
+        const {email,newPassword} = req.body
+
+
+        const result = changePasswordSchema.safeParse({email,newPassword})
+
+        if(!result.success){
+            res.status(400).json({success : false , message : result.error?.issues[0].message});
+            return;
+        }
+
+        await this._authUseCase.forgotPassword(result.data.email,result.data.newPassword);
+
+        res.status(STATUS_CODE.OK_200).json({
+            success:true,
+            message:SUCCESS_MESSAGE.PASSWORD_CHANGED_SUCCESS
         });
         return;
        }
