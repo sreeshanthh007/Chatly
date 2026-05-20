@@ -60,4 +60,7 @@ export const logoutService = async () : Promise<LogoutResponseDTO> =>{
 
     return result.data
 }
-
+export const googleAuthService = async (credential: string): Promise<LoginResponseDTO> => {
+    const result = await api.post(API_ENDPOINTS.GOOGLE_AUTH, { credential });
+    return result.data;
+}

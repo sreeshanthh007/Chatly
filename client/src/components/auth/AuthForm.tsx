@@ -5,6 +5,8 @@ import { Input } from "../ui/input";
 import { useFormik } from "formik";
 import { loginSchema, registerSchema } from "../../validators/auth.validator";
 import type { LoginRequestDTO, RegisterRequestDTO } from "../../DTO/auth.dto";
+import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleAuth } from "../../hooks/auth/useGoogleAuth";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -16,6 +18,7 @@ interface AuthFormProps {
 export function AuthForm({ type, onSubmit, isLoading, onForgotPassword }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isLogin = type === "login";
+  const googleAuthMutation = useGoogleAuth();
 
   const formik = useFormik({
     initialValues: {
@@ -125,7 +128,7 @@ export function AuthForm({ type, onSubmit, isLoading, onForgotPassword }: AuthFo
           <div className="text-error text-xs mt-1 ml-1">{formik.errors.password}</div>
         ) : null}
       </div>
-
+      
       <Button
         type="submit"
         className="w-full bg-accent text-background hover:bg-accent-hover font-medium h-11 flex items-center justify-center gap-2 mt-6 relative"
@@ -140,6 +143,18 @@ export function AuthForm({ type, onSubmit, isLoading, onForgotPassword }: AuthFo
           <span>{isLogin ? "Sign In" : "Create Account"}</span>
         )}
       </Button>
+      <div className="flex items-center justify-center mt-4">
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            if (credentialResponse.credential) {
+              googleAuthMutation.mutate(credentialResponse.credential);
+            }
+          }}
+          onError={() => {
+            console.log('Login Failed');
+          }}
+        />
+      </div>
     </form>
   );
 }

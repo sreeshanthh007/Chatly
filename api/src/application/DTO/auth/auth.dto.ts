@@ -26,3 +26,7 @@ export interface RegisterRequestDTO {
     email : string,
     password : string,
 }
+
+export interface GoogleAuthRequestDTO {
+    credential: string;
+}

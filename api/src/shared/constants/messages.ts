@@ -21,5 +21,9 @@ export const ERROR_MESSAGE = {
     OTP_EXPIRED : "OTP Expired",
     INVALID_OTP : "Invalid OTP",
     UNAUTHORIZED : "You are not authorized to access this resource",
-    TOKEN_ALREADY_BLACKLISTED : "Token is already blacklisted"
+    TOKEN_ALREADY_BLACKLISTED : "Token is already blacklisted",
+    INVALID_GOOGLE_TOKEN : "Invalid Google token payload",
+    GOOGLE_AUTH_FAILED : "Google Authentication Failed",
+    FAILED_TO_CREATE_USER : "Failed to create user",
+    SOCIAL_LOGIN_PASSWORD_ERROR : "This account uses Google Login. Please sign in with Google."
 }
