@@ -7,6 +7,7 @@ import { IOtpService } from "@domain/interfaces/services/otp.service.interface";
 import { IOtpCacheService } from "@domain/interfaces/services/otpCache.service.interface";
 import { ITokenService } from "@domain/interfaces/services/token.service.interface";
 import { IAuthUsecase } from "@domain/interfaces/usecases/auth/auth.usecase.interface";
+import { redisClient } from "@infrastructure/cache/redis";
 import { ERROR_MESSAGE } from "@shared/constants/messages";
 import { STATUS_CODE } from "@shared/constants/statusCode";
 import { CustomError } from "@shared/errors/custom.error";
@@ -43,12 +44,14 @@ export class AuthUseCase implements IAuthUsecase{
 
         const accessToken = this._tokenService.generateAccessToken({
             id : user._id!.toString(),
-            email : user.email
+            email : user.email,
+            role: user.role
         })
 
         const refreshToken = this._tokenService.generateRefreshToken({
             id : user._id!.toString(),
-            email : user.email
+            email : user.email,
+            role: user.role
         })
 
         return {
@@ -56,7 +59,8 @@ export class AuthUseCase implements IAuthUsecase{
                 id : user._id!.toString(),
                 email : user.email,
                 fullName : user.fullName,
-                userName : user.userName || ""
+                userName : user.userName || "",
+                role : user.role
             },
           token:{
               accessToken,
@@ -80,7 +84,8 @@ export class AuthUseCase implements IAuthUsecase{
         const userData = {
             fullName:data.fullName,
             email:data.email,
-            password:hashedPassword
+            password:hashedPassword,
+            role:"user"
         }
         await this._userRepo.create(userData)
 
@@ -203,4 +208,20 @@ export class AuthUseCase implements IAuthUsecase{
 
         return;
     }
+
+
+    async blackListToken(token: string): Promise<void> {
+
+        const isTokenBlacklisted = await redisClient.get(token);
+
+        if(isTokenBlacklisted){
+            throw new CustomError(ERROR_MESSAGE.TOKEN_ALREADY_BLACKLISTED,STATUS_CODE.BAD_REQUEST_400)
+        }
+
+        
+        await redisClient.set(token, "blacklisted", "EX", 7 * 24 * 60 * 60);
+
+        return;
+    }
+
 }

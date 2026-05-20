@@ -8,7 +8,7 @@ export const API_ENDPOINTS = {
   SENT_OTP_FOR_FORGOT_PASSWORD: "/api/v1/auth/sent-otp/forgot-password",
   VERIFY_OTP_FOR_FORGOT_PASSWORD: "/api/v1/auth/verify-otp/forgot-password",
   FORGOT_PASSWORD: "/api/v1/auth/forgot-password",
-  LOGOUT: "/api/v1/auth/logout",
+  USER_LOGOUT: "/api/v1/us/logout",
   REFRESH_TOKEN: "/api/v1/auth/refresh",
   CURRENT_USER: "/api/v1/auth/me",
   

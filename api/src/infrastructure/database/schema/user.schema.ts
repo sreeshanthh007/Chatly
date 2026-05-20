@@ -19,7 +19,15 @@ export const UserSchema = new mongoose.Schema <IUserModel>({
         type : String,
         unique : true,
         sparse:true,
-        default:null
+        default:null,
+        trim:true,
+    },
+
+    role : {
+        type : String,
+        required : true,
+        enum : ['admin','user'],
+        default : 'user'
     },
 
     profileImage : {

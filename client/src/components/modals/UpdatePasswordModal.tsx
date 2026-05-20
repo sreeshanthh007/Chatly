@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Lock, Mail } from "lucide-react";
 import { Button } from "../ui/button";
@@ -35,6 +36,12 @@ export function UpdatePasswordModal({
       });
     },
   });
+
+  useEffect(() => {
+    if (!isOpen) {
+      formik.resetForm();
+    }
+  }, [isOpen, formik.resetForm]);
 
   return (
     <AnimatePresence>

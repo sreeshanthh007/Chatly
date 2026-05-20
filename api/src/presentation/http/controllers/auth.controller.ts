@@ -10,6 +10,8 @@ import { emailSchema } from "../validators/auth/email.validator";
 import { emailOtpSchema } from "../validators/auth/emailOtp.validator";
 import { logger } from "@shared/utils/logger";
 import { changePasswordSchema } from "../validators/auth/changePassword.validator";
+import { clearAuthCookie, setAuthCookies } from "@shared/utils/cookie.helper";
+import { CustomRequest } from "../middlewares/auth.middleware";
 
 
 
@@ -36,10 +38,17 @@ export class AuthController {
 
         const data = await this._authUseCase.login(result.data)
 
+        const accessToken = data.token.accessToken
+        const refreshToken = data.token.refreshToken
+        const refreshTokenName = `${data.user.role}_refresh`
+        const accessTokenName = `${data.user.role}_access`
+
+        setAuthCookies(res,accessToken,refreshToken,accessTokenName,refreshTokenName);
+
         res.status(STATUS_CODE.OK_200).json({
             success:true,
             message:SUCCESS_MESSAGE.LOGIN_SUCCESS,
-            data:data
+            data:data.user
         });
         return;
     }
@@ -166,6 +175,25 @@ export class AuthController {
         res.status(STATUS_CODE.OK_200).json({
             success:true,
             message:SUCCESS_MESSAGE.PASSWORD_CHANGED_SUCCESS
+        });
+        return;
+       }
+
+
+       async logoutController(req : Request , res : Response) : Promise<void> {
+
+        const user = (req as CustomRequest).user
+
+        await this._authUseCase.blackListToken(user.refresh_token);
+
+        const accessTokenName = `${user.role}_access`
+        const refreshTokenName = `${user.role}_refresh`
+        
+        clearAuthCookie(res,accessTokenName,refreshTokenName);
+
+        res.status(STATUS_CODE.OK_200).json({
+            success:true,
+            message:SUCCESS_MESSAGE.LOGOUT_SUCCESS
         });
         return;
        }
