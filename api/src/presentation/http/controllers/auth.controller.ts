@@ -53,6 +53,31 @@ export class AuthController {
         return;
     }
 
+    async googleAuthController(req: Request, res: Response) {
+        const { credential } = req.body;
+
+        if (!credential) {
+            res.status(400).json({ success: false, message: "Google credential is required" });
+            return;
+        }
+
+        const data = await this._authUseCase.googleAuth({ credential });
+
+        const accessToken = data.token.accessToken;
+        const refreshToken = data.token.refreshToken;
+        const refreshTokenName = `${data.user.role}_refresh`;
+        const accessTokenName = `${data.user.role}_access`;
+
+        setAuthCookies(res, accessToken, refreshToken, accessTokenName, refreshTokenName);
+
+        res.status(STATUS_CODE.OK_200).json({
+            success: true,
+            message: SUCCESS_MESSAGE.LOGIN_SUCCESS,
+            data: data.user
+        });
+        return;
+    }
+
     async registerController(req : Request , res: Response) : Promise<void>{
 
         const {fullName , email , password} = req.body;

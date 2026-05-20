@@ -19,7 +19,6 @@ export const UserSchema = new mongoose.Schema <IUserModel>({
         type : String,
         unique : true,
         sparse:true,
-        default:null,
         trim:true,
     },
 
@@ -38,5 +37,11 @@ export const UserSchema = new mongoose.Schema <IUserModel>({
     password : {
         type : String,
     },
+    
+    authProvider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local'
+    }
 
 },{timestamps:true})

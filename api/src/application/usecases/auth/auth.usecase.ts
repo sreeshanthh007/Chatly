@@ -1,4 +1,4 @@
-import { LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO } from "@application/DTO/auth/auth.dto";
+import { GoogleAuthRequestDTO, LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO } from "@application/DTO/auth/auth.dto";
 import { TOKENS } from "@di/token";
 import { IUserRepository } from "@domain/interfaces/repositories/user.repository.interface";
 import { IBcryptService } from "@domain/interfaces/services/bcrypt.service.interface";
@@ -6,6 +6,7 @@ import { IEmailService } from "@domain/interfaces/services/email.service.interfa
 import { IOtpService } from "@domain/interfaces/services/otp.service.interface";
 import { IOtpCacheService } from "@domain/interfaces/services/otpCache.service.interface";
 import { ITokenService } from "@domain/interfaces/services/token.service.interface";
+import { IGoogleAuthService } from "@domain/interfaces/services/googleAuth.service.interface";
 import { IAuthUsecase } from "@domain/interfaces/usecases/auth/auth.usecase.interface";
 import { redisClient } from "@infrastructure/cache/redis";
 import { ERROR_MESSAGE } from "@shared/constants/messages";
@@ -25,7 +26,8 @@ export class AuthUseCase implements IAuthUsecase{
         @inject(TOKENS.EmailService) private _emailService : IEmailService,
         @inject(TOKENS.OtpService) private _otpService : IOtpService,
         @inject(TOKENS.OtpCacheService) private _otpCacheService : IOtpCacheService,
-        @inject(TOKENS.OtpBcryptService) private _otpBcryptService : IBcryptService
+        @inject(TOKENS.OtpBcryptService) private _otpBcryptService : IBcryptService,
+        @inject(TOKENS.GoogleAuthService) private _googleAuthService : IGoogleAuthService
    ){}
 
     async login(data: LoginRequestDTO): Promise<LoginResponseDTO> {
@@ -34,6 +36,10 @@ export class AuthUseCase implements IAuthUsecase{
 
         if(!user){
             throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
+        }
+
+        if(!user.password){
+            throw new CustomError(ERROR_MESSAGE.SOCIAL_LOGIN_PASSWORD_ERROR,STATUS_CODE.BAD_REQUEST_400)
         }
 
         const isPasswordValid = await this._bcryptService.compare(data.password,user.password)
@@ -67,6 +73,61 @@ export class AuthUseCase implements IAuthUsecase{
             refreshToken,
           }
             
+        }
+    }
+
+    async googleAuth(data: GoogleAuthRequestDTO): Promise<LoginResponseDTO> {
+        try {
+            const payload = await this._googleAuthService.verifyIdToken(data.credential);
+
+            let user = await this._userRepo.findByEmail(payload.email!);
+
+            if (!user) {
+                const userData = {
+                    fullName: payload.name!,
+                    email: payload.email!,
+                    role: "user",
+                    authProvider: "google",
+                    profileImage: payload.picture
+                };
+                
+                await this._userRepo.create(userData);
+                user = await this._userRepo.findByEmail(payload.email!);
+            }
+
+            if (!user) {
+                throw new CustomError(ERROR_MESSAGE.FAILED_TO_CREATE_USER, STATUS_CODE.INTERNAL_SERVER_ERROR_500);
+            }
+
+            const accessToken = this._tokenService.generateAccessToken({
+                id: user._id!.toString(),
+                email: user.email,
+                role: user.role
+            });
+
+            const refreshToken = this._tokenService.generateRefreshToken({
+                id: user._id!.toString(),
+                email: user.email,
+                role: user.role
+            });
+
+            return {
+                user: {
+                    id: user._id!.toString(),
+                    email: user.email,
+                    fullName: user.fullName,
+                    userName: user.userName || "",
+                    role: user.role
+                },
+                token: {
+                    accessToken,
+                    refreshToken,
+                }
+            };
+        } catch (error) {
+            logger.error("Google Auth Error:", error);
+            if (error instanceof CustomError) throw error;
+            throw new CustomError(ERROR_MESSAGE.GOOGLE_AUTH_FAILED, STATUS_CODE.UNAUTHORIZED_401);
         }
     }
 
@@ -147,6 +208,10 @@ export class AuthUseCase implements IAuthUsecase{
             throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
         }
 
+        if(!user.password){
+            throw new CustomError(ERROR_MESSAGE.SOCIAL_LOGIN_PASSWORD_ERROR,STATUS_CODE.BAD_REQUEST_400)
+        }
+
         const otp = this._otpService.generateOtp();
 
         const hashedOtp = await this._otpBcryptService.hash(otp);
@@ -166,6 +231,10 @@ export class AuthUseCase implements IAuthUsecase{
 
         if(!userExist){
             throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
+        }
+
+        if(!userExist.password){
+            throw new CustomError(ERROR_MESSAGE.SOCIAL_LOGIN_PASSWORD_ERROR,STATUS_CODE.BAD_REQUEST_400)
         }
 
         const storedHashedOtp = await this._otpCacheService.get(email)
@@ -192,6 +261,10 @@ export class AuthUseCase implements IAuthUsecase{
 
         if(!userExist){
             throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
+        }
+
+        if(!userExist.password){
+            throw new CustomError(ERROR_MESSAGE.SOCIAL_LOGIN_PASSWORD_ERROR,STATUS_CODE.BAD_REQUEST_400)
         }
 
         const isSamePassword = await this._bcryptService.compare(newPassword,userExist.password)

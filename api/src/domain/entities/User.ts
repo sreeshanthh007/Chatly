@@ -6,7 +6,8 @@ export interface User {
     email : string;
     userName?:string;
     role:string;
-    password : string
+    password? : string
+    authProvider?: string;
     profileImage?:string;
     
 } 

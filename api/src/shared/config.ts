@@ -16,5 +16,6 @@ export const CONFIG = {
     REDIS_HOST: process.env.REDIS_HOST!,
     REDIS_PORT: Number(process.env.REDIS_PORT),
     EMAIL_USER:process.env.EMAIL_USER!,
-    EMAIL_PASS:process.env.EMAIL_PASS!
+    EMAIL_PASS:process.env.EMAIL_PASS!,
+    GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID!
 }

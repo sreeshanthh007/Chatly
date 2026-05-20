@@ -8,5 +8,6 @@ export const TOKENS = {
     EmailService : Symbol("IEmailService"),
     OtpService : Symbol("IOtpService"),
     OtpCacheService : Symbol("IOtpCacheService"),
-    OtpBcryptService : Symbol("IOtpBcryptService")
+    OtpBcryptService : Symbol("IOtpBcryptService"),
+    GoogleAuthService : Symbol("IGoogleAuthService")
 } 

@@ -12,7 +12,8 @@ import { OtpService } from "@infrastructure/services/otp.service";
 import { IOtpService } from "@domain/interfaces/services/otp.service.interface";
 import { IOtpCacheService } from "@domain/interfaces/services/otpCache.service.interface";
 import { OtpCacheService } from "@infrastructure/services/otpCache.service";
-
+import { IGoogleAuthService } from "@domain/interfaces/services/googleAuth.service.interface";
+import { GoogleAuthService } from "@infrastructure/services/googleAuth.service";
 
 export class UsecaseRegistry {
  
@@ -31,6 +32,8 @@ export class UsecaseRegistry {
         container.register<IOtpCacheService>(TOKENS.OtpCacheService , OtpCacheService);
 
         container.register<IBcryptService>(TOKENS.OtpBcryptService , BcryptService);
+
+        container.register<IGoogleAuthService>(TOKENS.GoogleAuthService, GoogleAuthService);
     }
 
 }

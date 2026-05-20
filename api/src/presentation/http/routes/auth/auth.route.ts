@@ -21,6 +21,7 @@ export class AuthRoute extends BaseRouter {
         this.router.post(API_ENDPOINTS.AUTH.SENT_OTP_FOR_FORGOT_PASSWORD,asyncHandler(authController.sendOtpForForgotPasswordController.bind(authController)));
         this.router.post(API_ENDPOINTS.AUTH.VERIFY_OTP_FOR_FORGOT_PASSWORD,asyncHandler(authController.verifyOtpForForgotPasswordController.bind(authController)));
         this.router.patch(API_ENDPOINTS.AUTH.FORGOT_PASSWORD,asyncHandler(authController.forgotPasswordController.bind(authController)));
+        this.router.post(API_ENDPOINTS.AUTH.GOOGLE_AUTH,asyncHandler(authController.googleAuthController.bind(authController)));
         
 
     }

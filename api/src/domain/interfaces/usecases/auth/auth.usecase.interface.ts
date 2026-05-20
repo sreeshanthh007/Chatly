@@ -1,10 +1,12 @@
-import { LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO } from "@application/DTO/auth/auth.dto"
+import { GoogleAuthRequestDTO, LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO } from "@application/DTO/auth/auth.dto"
 
 
 export interface IAuthUsecase {
     login(data: LoginRequestDTO) : Promise<LoginResponseDTO>  
 
     register(data: RegisterRequestDTO) : Promise<void>
+
+    googleAuth(data: GoogleAuthRequestDTO) : Promise<LoginResponseDTO>
 
     sentOtp(email:string) : Promise<void>
 

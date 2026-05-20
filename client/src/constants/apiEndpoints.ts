@@ -11,5 +11,6 @@ export const API_ENDPOINTS = {
   USER_LOGOUT: "/api/v1/us/logout",
   REFRESH_TOKEN: "/api/v1/auth/refresh",
   CURRENT_USER: "/api/v1/auth/me",
+  GOOGLE_AUTH: "/api/v1/auth/google-auth",
   
 };
