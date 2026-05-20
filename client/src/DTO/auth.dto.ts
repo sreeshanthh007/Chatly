@@ -1,4 +1,4 @@
-import type { User } from "../types/user";
+
 
 
 export interface LoginRequestDTO {
@@ -7,10 +7,18 @@ export interface LoginRequestDTO {
 }
 
 export interface LoginResponseDTO {
-    message:string
-    accessToken : string,
-    refreshToken : string,
-    user : User,
+    success: boolean;
+    message: string;
+    data: {
+        id: string,
+        email: string,
+        fullName: string,
+        userName: string,
+    };
+    token : {
+        accessToken: string,
+        refreshToken: string,
+    }
 }
 
 
@@ -50,4 +58,12 @@ export interface ForgotPasswordRequestDTO {
 export interface ForgotPasswordResponseDTO {
     success: boolean;
     message: string;
+}
+
+
+
+
+export interface LogoutResponseDTO {
+    success:boolean
+    message:string
 }

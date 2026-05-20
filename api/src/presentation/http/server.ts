@@ -10,6 +10,7 @@ import { logger } from "@shared/utils/logger";
 import { AuthRoute } from "./routes/auth/auth.route";
 import { ErrorMiddleware } from "./middlewares/error.middleware";
 import { redisClient } from "@infrastructure/cache/redis";
+import { UserRouter } from "./routes/user/user.route";
 
  class Server {
 
@@ -52,7 +53,7 @@ import { redisClient } from "@infrastructure/cache/redis";
 
     private initRoutes() : void {
         this.App.use("/api/v1/auth",new AuthRoute().router);
-      
+        this.App.use("/api/v1/us",new UserRouter().router);
         const errorMiddleware = new ErrorMiddleware();
         this.App.use(errorMiddleware.handleError);
     }

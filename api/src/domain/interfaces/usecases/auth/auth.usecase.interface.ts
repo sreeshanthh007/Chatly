@@ -16,4 +16,9 @@ export interface IAuthUsecase {
 
     forgotPassword(email:string,newPassword:string) : Promise<void>
 
+
+    blackListToken(token:string) : Promise<void>
+
+    
+
 }

@@ -17,11 +17,15 @@ import {
   Download,
   MessageCircle,
   X,
-  Sparkles
+  Sparkles,
+  LogOut
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Avatar } from "../../components/ui/avatar";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
+import { useLogout } from "../../hooks/auth/UseLogout";
 
 // Interface Definitions
 interface Message {
@@ -48,6 +52,9 @@ interface Conversation {
 }
 
 export default function DashboardPage() {
+  const { userName } = useSelector((state: RootState) => state.user);
+  const logoutMutation = useLogout();
+  
   // Mock conversations database
   const [conversations, setConversations] = useState<Conversation[]>([
     {
@@ -173,6 +180,7 @@ export default function DashboardPage() {
   // Modals / Dropdowns
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState<boolean>(false);
+  const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
 
   // References
   const chatBottomRef = useRef<HTMLDivElement>(null);
@@ -340,12 +348,28 @@ export default function DashboardPage() {
               Chatly
             </span>
           </div>
-          <div className="relative group cursor-pointer">
-            <Avatar fallback="ME" size="sm" isOnline={true} />
-            <div className="absolute right-0 top-10 bg-elevated border border-border rounded-[8px] p-2 text-xs w-[140px] shadow-xl hidden group-hover:block z-50">
-              <div className="font-medium text-text-primary">Admin User</div>
-              <div className="text-text-secondary text-[10px]">admin@chatly.io</div>
+          <div className="relative cursor-pointer">
+            <div onClick={() => setShowProfileMenu(!showProfileMenu)}>
+              <Avatar fallback={userName ? userName.substring(0, 2).toUpperCase() : "ME"} size="sm" isOnline={true} />
             </div>
+            
+            {showProfileMenu && (
+              <div className="absolute right-0 top-10 bg-elevated border border-border rounded-[8px] p-2 text-xs w-[140px] shadow-xl z-50 animate-fade-in">
+                <div className="font-medium text-text-primary truncate">{userName || 'User'}</div>
+                <div className="text-text-secondary text-[10px] border-b border-border/40 pb-2 mb-2 truncate">Active Session</div>
+                <button 
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    logoutMutation.mutate();
+                  }}
+                  disabled={logoutMutation.isPending}
+                  className="w-full text-left px-2 py-1.5 text-error hover:bg-error/10 rounded-[4px] transition-colors flex items-center gap-2 font-medium"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "../../constants/apiEndpoints";
-import type { ForgotPasswordRequestDTO, ForgotPasswordResponseDTO, LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO, RegisterResponseDTO, SentOtpResponseDTO, VerifyOtpRequestDTO, VerifyOtpResponseDTO } from "../../DTO/auth.dto";
+import type { ForgotPasswordRequestDTO, ForgotPasswordResponseDTO, LoginRequestDTO, LoginResponseDTO, LogoutResponseDTO, RegisterRequestDTO, RegisterResponseDTO, SentOtpResponseDTO, VerifyOtpRequestDTO, VerifyOtpResponseDTO } from "../../DTO/auth.dto";
 import api from "../../lib/axios";
 
 
@@ -53,3 +53,11 @@ export const forgotPasswordService = async (data : ForgotPasswordRequestDTO) : P
 
     return result.data
 }
+
+export const logoutService = async () : Promise<LogoutResponseDTO> =>{
+
+    const result =  await api.post(API_ENDPOINTS.USER_LOGOUT)
+
+    return result.data
+}
+

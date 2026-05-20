@@ -11,6 +11,7 @@ interface JwtPayloadData {
 }
 
 
+
 export class TokenService implements ITokenService {
 
     private jwtSecret : Secret

@@ -6,6 +6,7 @@ export interface LoginResponseDTO {
         email : string,
         fullName : string,
         userName : string,
+        role:string,
     },
     token : {
         accessToken : string,

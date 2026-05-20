@@ -20,4 +20,6 @@ export const ERROR_MESSAGE = {
     USER_ALREADY_EXISTS : "User Already Exists",
     OTP_EXPIRED : "OTP Expired",
     INVALID_OTP : "Invalid OTP",
+    UNAUTHORIZED : "You are not authorized to access this resource",
+    TOKEN_ALREADY_BLACKLISTED : "Token is already blacklisted"
 }

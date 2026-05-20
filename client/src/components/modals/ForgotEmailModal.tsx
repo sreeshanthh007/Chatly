@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail } from "lucide-react";
 import { Button } from "../ui/button";
@@ -33,6 +34,12 @@ export function ForgotEmailModal({
       onSubmit(values.email);
     },
   });
+
+  useEffect(() => {
+    if (!isOpen) {
+      formik.resetForm();
+    }
+  }, [isOpen, formik.resetForm]);
 
   return (
     <AnimatePresence>
