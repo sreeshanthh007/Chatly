@@ -10,7 +10,15 @@ export class UserRepository implements IUserRepository {
        await UserModel.create(data)
     }
 
-    findByEmail(email: string): Promise<User | null> {
+    async findByEmail(email: string): Promise<User | null> {
        return UserModel.findOne({email})
     } 
+
+    async findById(id: string): Promise<User | null> {
+      return UserModel.findById(id)
+    }
+
+    async findByIdAndChangePassword(id: string, newPassword: string): Promise<void> {
+      await UserModel.findByIdAndUpdate(id, { password: newPassword })
+    }
 }

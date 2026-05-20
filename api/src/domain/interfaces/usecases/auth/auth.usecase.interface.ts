@@ -10,4 +10,10 @@ export interface IAuthUsecase {
 
     verifyOtp(email:string,otp:string) : Promise<void>
 
+    sentOtpForForgotPassword(email:string) : Promise<void>
+
+    verifyOtpForForgotPassword(email:string,otp:string) : Promise<void>
+
+    forgotPassword(email:string,newPassword:string) : Promise<void>
+
 }

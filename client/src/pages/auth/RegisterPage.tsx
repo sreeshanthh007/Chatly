@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MessageCircle, AlertTriangle } from "lucide-react";
+import { motion } from "framer-motion";
 import { AuthForm } from "../../components/auth/AuthForm";
 import { OtpModal } from "../../components/common/OtpModal";
 import { UseRegister } from "../../hooks/auth/UseRegister";
@@ -14,6 +15,7 @@ export default function RegisterPage() {
   const [isOtpOpen, setIsOtpOpen] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [formData, setFormData] = useState<RegisterRequestDTO | null>(null);
+  const [isExiting, setIsExiting] = useState(false);
 
   const registerMutation = UseRegister();
   const sentOtpMutation = useSentOtp();
@@ -35,8 +37,20 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (registerMutation.data?.success) {
-      setIsOtpOpen(false);
-      navigate("/login");
+      // Start exit transition shortly before navigation
+      const exitTimer = setTimeout(() => {
+        setIsExiting(true);
+      }, 1400);
+
+      const navTimer = setTimeout(() => {
+        setIsOtpOpen(false);
+        navigate("/login", { state: { fromRegister: true } });
+      }, 1800);
+
+      return () => {
+        clearTimeout(exitTimer);
+        clearTimeout(navTimer);
+      };
     }
   }, [registerMutation.data?.success, navigate]);
 
@@ -55,17 +69,30 @@ export default function RegisterPage() {
   };
 
   const handleOtpResend = () => {
-    sentOtpMutation.mutate(registeredEmail);
+    sentOtpMutation.mutate(registeredEmail);                                                                                                                                                                                                                                                                                   
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden select-none">
+    <motion.div
+      animate={isExiting ? { opacity: 0 } : { opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
+      className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden select-none"
+    >
       {/* Visual background accents */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main card */}
-      <div className="w-full max-w-[420px] bg-surface border border-border p-8 rounded-[16px] shadow-2xl relative z-10 animate-fade-in">
+      <motion.div
+        initial={{ y: 4, opacity: 0 }}
+        animate={isExiting ? { x: -100, opacity: 0 } : { y: 0, opacity: 1 }}
+        transition={
+          isExiting
+            ? { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+            : { duration: 0.25, ease: "easeOut" }
+        }
+        className="w-full max-w-[420px] bg-surface border border-border p-8 rounded-[16px] shadow-2xl relative z-10"
+      >
         {/* Wordmark logo */}
         <div className="flex flex-col items-center mb-6">
           <div className="h-12 w-12 rounded-[12px] bg-accent/10 border border-accent/20 flex items-center justify-center mb-3">
@@ -100,7 +127,7 @@ export default function RegisterPage() {
             Sign In
           </Link>
         </div>
-      </div>
+      </motion.div>
 
       <OtpModal
         isOpen={isOtpOpen}
@@ -108,8 +135,9 @@ export default function RegisterPage() {
         onSubmit={handleOtpSubmit}
         onResend={handleOtpResend}
         isLoading={verifyOtpMutation.isPending || registerMutation.isPending}
+        isSuccess={registerMutation.data?.success}
         email={registeredEmail}
       />
-    </div>
+    </motion.div>
   );
 }

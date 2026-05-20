@@ -41,3 +41,13 @@ export interface VerifyOtpResponseDTO {
     message:string
 }
 
+
+export interface ForgotPasswordRequestDTO {
+    email : string,
+    newPassword : string,
+}
+
+export interface ForgotPasswordResponseDTO {
+    success: boolean;
+    message: string;
+}

@@ -132,4 +132,75 @@ export class AuthUseCase implements IAuthUsecase{
 
         return;
     }
+
+
+    async sentOtpForForgotPassword(email: string): Promise<void> {
+        
+        const user = await this._userRepo.findByEmail(email);
+
+        if(!user){
+            throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
+        }
+
+        const otp = this._otpService.generateOtp();
+
+        const hashedOtp = await this._otpBcryptService.hash(otp);
+
+        logger.info("Generated OTP :",otp);
+
+        await this._otpCacheService.set(email,hashedOtp,300)
+
+        await this._emailService.sendOtpMail(email,"Chatly - verify your email for updating password",otp);   
+    }
+
+
+
+    async verifyOtpForForgotPassword(email: string, otp: string): Promise<void> {
+
+        const userExist = await this._userRepo.findByEmail(email)
+
+        if(!userExist){
+            throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
+        }
+
+        const storedHashedOtp = await this._otpCacheService.get(email)
+
+        if(!storedHashedOtp){
+            throw new CustomError(ERROR_MESSAGE.OTP_EXPIRED,STATUS_CODE.BAD_REQUEST_400)
+        }
+
+        const isOtpValid = await this._otpBcryptService.compare(otp,storedHashedOtp);
+
+        if(!isOtpValid){
+            throw new CustomError(ERROR_MESSAGE.INVALID_OTP,STATUS_CODE.BAD_REQUEST_400)
+        }
+
+        await this._otpCacheService.del(email);
+
+        return;
+    }
+
+
+    async forgotPassword(email: string, newPassword: string): Promise<void> {
+        
+        const userExist = await this._userRepo.findByEmail(email)
+
+        if(!userExist){
+            throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
+        }
+
+        const isSamePassword = await this._bcryptService.compare(newPassword,userExist.password)
+
+        if(isSamePassword){
+            throw new CustomError(ERROR_MESSAGE.SAME_PASSWORD,STATUS_CODE.BAD_REQUEST_400)
+        }
+
+        const newHashedPassword = await this._bcryptService.hash(newPassword)
+
+        await this._userRepo.findByIdAndChangePassword(userExist._id!,newHashedPassword);
+
+        await this._emailService.sendPasswordChangedMail(userExist.email,"Chatly - Password Changed",userExist.email);
+
+        return;
+    }
 }
