@@ -38,11 +38,8 @@ export class AuthUseCase implements IAuthUsecase{
             throw new CustomError(ERROR_MESSAGE.USER_NOT_FOUND,STATUS_CODE.NOT_FOUND_404)
         }
 
-        if(!user.password){
-            throw new CustomError(ERROR_MESSAGE.SOCIAL_LOGIN_PASSWORD_ERROR,STATUS_CODE.BAD_REQUEST_400)
-        }
 
-        const isPasswordValid = await this._bcryptService.compare(data.password,user.password)
+        const isPasswordValid = await this._bcryptService.compare(data.password,user.password!)
 
         if(!isPasswordValid){
             throw new CustomError(ERROR_MESSAGE.INVALID_CREDENTIALS,STATUS_CODE.UNAUTHORIZED_401)
